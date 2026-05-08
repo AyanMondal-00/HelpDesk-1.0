@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+:root {
+  /* SaaS Blue Color System */
+  --primary: #2563EB;
+  --primary-hover: #1E40AF;
+  --accent: #38BDF8;
+  --background: #F8FAFC;
+  --sidebar: #0F172A;
+  --card: #FFFFFF;
+  --text: #0F172A;
+  --muted: #64748B;
+  
+  /* Legacy support */
+  --background-alt: #ffffff;
+  --foreground: #0F172A;
+}
+
+@theme inline {
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-sidebar: var(--sidebar);
+}
+
+body {
+  background: var(--background);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+}
+
+/* SaaS Utilities */
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg font-medium transition-colors;
+}
+
+.btn-primary-outline {
+  @apply border border-blue-600 text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg font-medium transition-colors;
+}
+
+.card-saas {
+  @apply bg-white rounded-xl shadow-sm border border-slate-200/60;
+}
+
+.badge-saas {
+  @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium;
+}
+
+.text-muted {
+  color: var(--muted);
+}
+
+.sidebar-btn {
+  @apply w-full px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200;
+}
