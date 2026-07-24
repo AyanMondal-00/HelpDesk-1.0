@@ -1,0 +1,55 @@
+# Git Ignore configurations for HelpDesk Project
+
+# Virtual Environment (Python)
+backend/venv/
+backend/env/
+ENV/
+env/
+venv/
+*.venv/
+
+# Python compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django specific
+backend/db.sqlite3
+backend/db.sqlite3-journal
+backend/media/
+backend/staticfiles/
+backend/static/collected/
+
+# Environment Variables & Secrets (CRITICAL: Do not commit these to GitHub)
+backend/.env
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+.env
+.env.local
+*.env
+*.pem
+*.key
+
+# Node / Frontend dependencies & builds
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+node_modules/
+
+# OS/System files
+.DS_Store
+Thumbs.db
+db.db
+
+# IDEs/Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

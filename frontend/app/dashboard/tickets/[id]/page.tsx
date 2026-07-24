@@ -116,7 +116,8 @@ export default function TicketDetailPage() {
    */
   useEffect(() => {
     // Retrieve user details from localStorage
-    setRole(localStorage.getItem("user_role"));
+    const userRole = localStorage.getItem("user_role");
+    setRole(userRole);
     setUserId(parseInt(localStorage.getItem("user_id") || "0", 10));
     setUserName(localStorage.getItem("username"));
 
@@ -132,9 +133,11 @@ export default function TicketDetailPage() {
       setSelectedStatus(data.current_status);
     });
 
-    apiGet(`/api/tickets/${id}/eligible-members/`).then((data) =>
-      setEligibleMembers(data.results || data)
-    );
+    if (userRole !== "CLIENT") {
+      apiGet(`/api/tickets/${id}/eligible-members/`).then((data) =>
+        setEligibleMembers(data.results || data)
+      );
+    }
   }, [id]);
 
   /**

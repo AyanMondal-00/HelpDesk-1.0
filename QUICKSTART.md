@@ -1,27 +1,86 @@
 # Silicon Systems HelpDesk Quickstart Guide for Developers
 
-## 🚀 Quick Setup (5 minutes)
+## 🚀 Setup Guide for a New PC (Step-by-Step)
 
-### Backend
-```bash
-cd backend
-python -m venv venv
-venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
-```
-Visit: `http://localhost:8000/admin`
+Before running the project on a new PC, make sure you have the following prerequisites installed:
+1. **Python** (version 3.10 or higher)
+2. **Node.js** (version 18 or higher)
+3. **PostgreSQL** (running locally on port 5432)
 
-### Frontend
-```bash
-cd frontend
-npm install
-# Create .env.local with: NEXT_PUBLIC_API_URL=http://localhost:8000
-npm run dev
-```
-Visit: `http://localhost:3000` (Silicon Systems HelpDesk dashboard)
+---
+
+### Step 1: Database Setup (PostgreSQL)
+1. Open your PostgreSQL client (pgAdmin, psql shell, or terminal) and create a database named `helpdesk_db`:
+   ```sql
+   CREATE DATABASE helpdesk_db;
+   ```
+
+### Step 2: Backend Setup (Django)
+1. Navigate to the backend folder:
+   ```bash
+   cd backend
+   ```
+2. Create a virtual environment:
+   * **Windows (PowerShell/CMD)**: `python -m venv venv`
+   * **Mac/Linux**: `python3 -m venv venv`
+3. Activate the virtual environment:
+   * **Windows (PowerShell)**: `venv\Scripts\Activate.ps1`
+   * **Windows (CMD)**: `venv\Scripts\activate.bat`
+   * **Mac/Linux**: `source venv/bin/activate`
+4. Install backend dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+5. Create a `.env` file inside the `backend/` folder (same directory as `manage.py`) with the following environment variables:
+   ```env
+   SECRET_KEY=your-super-secret-key-change-in-prod
+   DEBUG=True
+   ALLOWED_HOSTS=127.0.0.1,localhost,192.168.1.63
+   DB_NAME=helpdesk_db
+   DB_USER=postgres
+   DB_PASSWORD=YOUR_POSTGRES_PASSWORD_HERE
+   DB_HOST=localhost
+   DB_PORT=5432
+   FRONTEND_URL=http://localhost:3000
+   
+   # Optional settings for ticket-creation-via-email (IMAP)
+   GEMAIL=samirmondal1789@gmail.com
+   GPASSWORD=your_gmail_app_password
+   ```
+6. Run database migrations to set up tables:
+   ```bash
+   python manage.py migrate
+   ```
+7. Create an Admin user (superuser) to access the panel:
+   ```bash
+   python manage.py createsuperuser
+   ```
+8. Start the backend development server:
+   ```bash
+   python manage.py runserver
+   ```
+   *Visit: `http://localhost:8000/admin` to verify backend access.*
+
+---
+
+### Step 3: Frontend Setup (Next.js)
+1. Open a new terminal/command prompt window and navigate to the frontend folder:
+   ```bash
+   cd frontend
+   ```
+2. Install frontend node dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env.local` file inside the `frontend/` folder:
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:8000
+   ```
+4. Start the frontend development server:
+   ```bash
+   npm run dev
+   ```
+   *Visit: `http://localhost:3000` to open the HelpDesk dashboard.*
 
 ---
 

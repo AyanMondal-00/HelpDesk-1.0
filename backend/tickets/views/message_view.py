@@ -2,6 +2,7 @@
 Views for handling ticket messages and communication between clients and support.
 """
 from rest_framework import generics, permissions, status
+from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, NotFound
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters as drf_filters
@@ -199,7 +200,7 @@ class TicketMessageMarkReadView(generics.UpdateAPIView):
             instance.is_read = request.data['is_read']
             instance.save()
             serializer = self.get_serializer(instance)
-            return self.response_class(
+            return Response(
                 data=serializer.data,
                 status=status.HTTP_200_OK
             )
