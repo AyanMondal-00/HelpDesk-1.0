@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand
 import imaplib
 import email
 import re
+import time
 
 from datetime import datetime, timedelta
 
@@ -14,7 +15,35 @@ from core.models import Issue, SubIssue
 class Command(BaseCommand):
     help = "Fetch emails and create tickets"
 
-    def handle(self, *args, **kwargs):
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--loop',
+            action='store_true',
+            help='Run continuously in a loop',
+        )
+        parser.add_argument(
+            '--interval',
+            type=int,
+            default=12,
+            help='Interval between runs in seconds',
+        )
+
+    def handle(self, *args, **options):
+        loop = options.get('loop', False)
+        interval = options.get('interval', 12)
+
+        if loop:
+            self.stdout.write(self.style.SUCCESS(f"Starting email fetcher loop. Checking every {interval} seconds..."))
+            try:
+                while True:
+                    self.fetch_emails()
+                    time.sleep(interval)
+            except KeyboardInterrupt:
+                self.stdout.write(self.style.WARNING("Email fetcher loop stopped."))
+        else:
+            self.fetch_emails()
+
+    def fetch_emails(self):
         # Fetch email from environment variables first, fallback to default
         EMAIL = os.getenv('GEMAIL') or os.getenv('EMAIL_HOST_USER') or "samirmondal1789@gmail.com"
         PASSWORD = os.getenv('GPASSWORD') or os.getenv('EMAIL_HOST_PASSWORD')

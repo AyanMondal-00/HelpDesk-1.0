@@ -166,5 +166,7 @@ CORS_ALLOWED_ORIGINS = [
     os.getenv('FRONTEND_URL', 'http://localhost:3000'),
 ]
 CSRF_TRUSTED_ORIGINS = [
-    "http://192.168.1.63:3000",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    os.getenv('FRONTEND_URL', 'http://localhost:3000'),
 ]
