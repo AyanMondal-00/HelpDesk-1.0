@@ -30,7 +30,10 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG") == "True"
 
 # List of host/domain names that this Django site can serve
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS",
+    "127.0.0.1,localhost,os.getenv('IP_ADDRESS')",
+).split(",")
 
 
 # Application definition
@@ -170,3 +173,11 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:3000",
     os.getenv('FRONTEND_URL', 'http://localhost:3000'),
 ]
+
+# Email settings for SMTP notifications
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'samirmondal1789@gmail.com')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', os.getenv('GPASSWORD'))
