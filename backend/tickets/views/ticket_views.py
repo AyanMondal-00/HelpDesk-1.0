@@ -102,7 +102,7 @@ class TicketCreateView(generics.CreateAPIView):
     """
     API view to handle the creation of new tickets.
     
-    Only users with the CLIENT role are permitted to create tickets.
+    Only users with the CLIENT or ADMIN role are permitted to create tickets.
     """
     serializer_class = TicketCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -115,16 +115,20 @@ class TicketCreateView(generics.CreateAPIView):
             serializer: The ticket create serializer.
             
         Raises:
-            PermissionDenied: If the user is not a client.
+            PermissionDenied: If the user is not a client or admin.
         """
         user = self.request.user
 
-        if user.role != User.Role.CLIENT:
-            raise permissions.PermissionDenied("Only clients can create tickets.")
+        if user.role != User.Role.CLIENT and user.role != User.Role.ADMIN:
+            raise permissions.PermissionDenied("Only clients and admins can create tickets.")
 
-        # Associate the new ticket with the Client profile linked to the User
-        client = Client.objects.get(user=user)
-        serializer.save(client=client)
+        if user.role == User.Role.CLIENT:
+            # Associate the new ticket with the Client profile linked to the User
+            client = Client.objects.get(user=user)
+            serializer.save(client=client)
+        else:
+            # For admin, the client is already validated and set in validated_data by the serializer
+            serializer.save()
 
 
 

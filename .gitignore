@@ -53,3 +53,4 @@ db.db
 *.njsproj
 *.sln
 *.swp
+.tip-images

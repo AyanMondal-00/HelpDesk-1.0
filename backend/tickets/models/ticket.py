@@ -73,10 +73,11 @@ class Ticket(TimeStampedModel):
         RESOLVED = 'RESOLVED', 'Resolved'   # Issue resolved
         CLOSED = 'CLOSED', 'Closed'         # Final state
 
-    ticket_number = models.UUIDField(
-        default=uuid.uuid4,
+    ticket_number = models.CharField(
+        max_length=20,
+        unique=True,
         editable=False,
-        unique=True
+        blank=True
     )
 
     client = models.ForeignKey(
@@ -137,7 +138,7 @@ class Ticket(TimeStampedModel):
             
         Returns:
             A list of status strings representing valid next states.
-        """
+            """
         transitions = {
             "CREATED": ["ASSIGNED"],
             "ASSIGNED": ["STARTED"],
@@ -164,6 +165,20 @@ class Ticket(TimeStampedModel):
         """
         is_new = self.pk is None
         assigned_changed = False
+
+        # Generate sequential ticket number if not set
+        if not self.ticket_number:
+            import re
+            last_ticket = Ticket.objects.filter(ticket_number__startswith="INC").order_by('-id').first()
+            if last_ticket:
+                match = re.search(r'INC(\d+)', last_ticket.ticket_number)
+                if match:
+                    next_num = int(match.group(1)) + 1
+                else:
+                    next_num = 1
+            else:
+                next_num = 1
+            self.ticket_number = f"INC{next_num:05d}"
 
         if not is_new:
             # Check if current ticket in DB is already closed

@@ -100,7 +100,10 @@ class TicketCreateSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Ticket
-        fields = ["issue", "sub_issue", "description"]
+        fields = ["issue", "sub_issue", "description", "client"]
+        extra_kwargs = {
+            "client": {"required": False, "allow_null": True}
+        }
 
     def validate(self, data):
         """
@@ -110,6 +113,13 @@ class TicketCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Selected sub-issue does not belong to selected issue."
             )
+        
+        request = self.context.get("request")
+        if request and request.user and request.user.role == User.Role.ADMIN:
+            if not data.get("client"):
+                raise serializers.ValidationError(
+                    {"client": "Client is required for admin ticket creation."}
+                )
         return data
 
 

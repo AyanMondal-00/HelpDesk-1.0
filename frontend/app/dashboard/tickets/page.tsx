@@ -8,9 +8,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiGet } from "@/lib/api";
+import { apiGet, apiPost } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import StatusBadge from "@/component/StatusBadge";
+
+interface Issue {
+  id: number;
+  name: string;
+}
 
 /**
  * @interface Ticket
@@ -61,6 +66,18 @@ export default function TicketsPage() {
   const [filterClient, setFilterClient] = useState<string>("");
   const [filterMember, setFilterMember] = useState<string>("");
   const [filterMonth, setFilterMonth] = useState<string>("");
+
+  // Issue & Sub-issue popup modal states
+  const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
+  const [issueModalTab, setIssueModalTab] = useState<"category" | "subcategory">("category");
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newSubcategoryName, setNewSubcategoryName] = useState("");
+  const [newSubcategoryParentId, setNewSubcategoryParentId] = useState("");
+  const [issuesList, setIssuesList] = useState<Issue[]>([]);
+  const [issuesLoading, setIssuesLoading] = useState(false);
+  const [modalSubmitLoading, setModalSubmitLoading] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null);
+  const [modalSuccess, setModalSuccess] = useState(false);
   
   // Number of items to display per page
   const itemsPerPage = 12;
@@ -83,6 +100,80 @@ export default function TicketsPage() {
         setLoading(false);
       });
   }, []);
+
+  /**
+   * @effect
+   * @description Fetches issue categories when the issue modal is opened.
+   */
+  useEffect(() => {
+    if (isIssueModalOpen) {
+      loadIssuesList();
+    }
+  }, [isIssueModalOpen]);
+
+  /**
+   * @function loadIssuesList
+   * @description Fetches the full list of issue categories from backend.
+   */
+  const loadIssuesList = async () => {
+    setIssuesLoading(true);
+    try {
+      const data: unknown = await apiGet("/api/issues/");
+      const results = Array.isArray(data) ? data : ((data as { results?: Issue[] }).results || []);
+      setIssuesList(results as Issue[]);
+    } catch (err: unknown) {
+      console.error("Failed to load issue categories:", err);
+    } finally {
+      setIssuesLoading(false);
+    }
+  };
+
+  /**
+   * @function handleIssueModalSubmit
+   * @description Handles form submission for creating issues and subissues.
+   */
+  const handleIssueModalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setModalSubmitLoading(true);
+    setModalError(null);
+    setModalSuccess(false);
+
+    try {
+      if (issueModalTab === "category") {
+        if (!newCategoryName.trim()) {
+          throw new Error("Category name is required.");
+        }
+        await apiPost("/api/issues/", { name: newCategoryName.trim() });
+      } else {
+        if (!newSubcategoryParentId) {
+          throw new Error("Please select a parent category.");
+        }
+        if (!newSubcategoryName.trim()) {
+          throw new Error("Subcategory name is required.");
+        }
+        await apiPost("/api/subissues/", {
+          name: newSubcategoryName.trim(),
+          issue: Number(newSubcategoryParentId),
+        });
+      }
+
+      setModalSuccess(true);
+      setNewCategoryName("");
+      setNewSubcategoryName("");
+      await loadIssuesList();
+      
+      setTimeout(() => {
+        setIsIssueModalOpen(false);
+        setModalSuccess(false);
+      }, 1500);
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Failed to create issue";
+      console.error("Error creating issue:", err);
+      setModalError(errorMsg);
+    } finally {
+      setModalSubmitLoading(false);
+    }
+  };
 
   /**
    * @function getHeaderText
@@ -264,9 +355,19 @@ export default function TicketsPage() {
   if (!tickets.length) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-1">{getHeaderText()}</h1>
-          <p className="text-slate-500 text-sm">{getHeaderDescription()}</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-1">{getHeaderText()}</h1>
+            <p className="text-slate-500 text-sm">{getHeaderDescription()}</p>
+          </div>
+          {userRole === "ADMIN" && (
+            <button
+              onClick={() => setIsIssueModalOpen(true)}
+              className="self-start sm:self-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-800 text-white font-medium rounded-lg text-sm transition shadow-sm flex items-center gap-2"
+            >
+              <span>+</span> Create Issue
+            </button>
+          )}
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-slate-200/60 p-16 text-center">
           <div className="text-5xl mb-4">📭</div>
@@ -286,11 +387,21 @@ export default function TicketsPage() {
   return (
     <div className="space-y-4 md:space-y-6">
       {/* HEADER SECTION */}
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1 tracking-tight">
-          {getHeaderText()}
-        </h1>
-        <p className="text-slate-500 text-xs md:text-sm">{getHeaderDescription()}</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1 tracking-tight">
+            {getHeaderText()}
+          </h1>
+          <p className="text-slate-500 text-xs md:text-sm">{getHeaderDescription()}</p>
+        </div>
+        {userRole === "ADMIN" && (
+          <button
+            onClick={() => setIsIssueModalOpen(true)}
+            className="self-start sm:self-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-800 text-white font-medium rounded-lg text-sm transition shadow-sm flex items-center gap-2"
+          >
+            <span>+</span> Create Issue
+          </button>
+        )}
       </div>
 
       {/* STATISTICS OVERVIEW CARDS */}
@@ -677,6 +788,139 @@ export default function TicketsPage() {
             >
               Next
             </button>
+          </div>
+        </div>
+      )}
+      {/* CREATE ISSUE / SUB-ISSUE POPUP MODAL */}
+      {isIssueModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* MODAL HEADER */}
+            <div className="bg-slate-50 px-6 py-4 border-b border-slate-200/60 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-900">Create New Issue / Type</h3>
+              <button
+                onClick={() => setIsIssueModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 p-1"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* TAB SELECTOR */}
+            <div className="flex border-b border-slate-200">
+              <button
+                type="button"
+                onClick={() => {
+                  setIssueModalTab("category");
+                  setModalError(null);
+                }}
+                className={`flex-1 py-3 text-center text-sm font-semibold border-b-2 transition-all ${
+                  issueModalTab === "category"
+                    ? "border-blue-600 text-blue-600 bg-blue-50/30"
+                    : "border-transparent text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                📁 New Category
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIssueModalTab("subcategory");
+                  setModalError(null);
+                }}
+                className={`flex-1 py-3 text-center text-sm font-semibold border-b-2 transition-all ${
+                  issueModalTab === "subcategory"
+                    ? "border-blue-600 text-blue-600 bg-blue-50/30"
+                    : "border-transparent text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                📄 New Subcategory
+              </button>
+            </div>
+
+            {/* MODAL BODY */}
+            <form onSubmit={handleIssueModalSubmit} className="p-6 space-y-4">
+              {issueModalTab === "category" ? (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase mb-2">Category Name</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Software, Hardware"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  />
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase mb-2">Parent Category</label>
+                    {issuesLoading ? (
+                      <div className="text-xs text-slate-400">Loading categories...</div>
+                    ) : (
+                      <select
+                        required
+                        value={newSubcategoryParentId}
+                        onChange={(e) => setNewSubcategoryParentId(e.target.value)}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                      >
+                        <option value="">— Select Category —</option>
+                        {issuesList.map((issue) => (
+                          <option key={issue.id} value={issue.id}>
+                            {issue.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 uppercase mb-2">Subcategory Name</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Windows installation, Network issue"
+                      value={newSubcategoryName}
+                      onChange={(e) => setNewSubcategoryName(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                    />
+                  </div>
+                </>
+              )}
+
+              {modalSuccess && (
+                <div className="bg-green-50 border border-green-200 text-green-700 p-3 rounded-lg text-xs font-medium">
+                  ✓ Created successfully!
+                </div>
+              )}
+
+              {modalError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-xs font-medium">
+                  {modalError}
+                </div>
+              )}
+
+              {/* MODAL ACTIONS */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsIssueModalOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={modalSubmitLoading || (issueModalTab === "subcategory" && !newSubcategoryParentId)}
+                  className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-800 transition disabled:bg-blue-300"
+                >
+                  {modalSubmitLoading ? "Creating..." : "Create"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

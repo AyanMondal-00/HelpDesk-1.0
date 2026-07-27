@@ -192,9 +192,7 @@ export default function TicketDetailPage() {
       <div className="flex justify-between items-center">
         <div>
           <p className="text-xs tracking-wider uppercase text-slate-400">
-            Ticket #{typeof ticket.ticket_number === "string" && ticket.ticket_number.includes("-")
-              ? ticket.ticket_number.split("-")[0]
-              : String(ticket.ticket_number).slice(0, 8)}
+            Ticket #{ticket.ticket_number}
           </p>
           <h1 className="text-3xl font-bold text-slate-800 mt-2">
             Support Request Details

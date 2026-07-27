@@ -157,11 +157,13 @@ export async function apiPost(endpoint: string, body: Record<string, unknown>) {
       errorMsg = errorData.detail;
     } else if (errorData?.error) {
       errorMsg = errorData.error;
-    } else if (typeof errorData === 'object') {
+    } else if (typeof errorData === 'object' && errorData !== null) {
       // Handle Django Rest Framework field-level validation errors
-      const firstError = Object.values(errorData)[0];
-      if (firstError) {
-        errorMsg = Array.isArray(firstError) ? firstError[0] : String(firstError);
+      const entries = Object.entries(errorData);
+      if (entries.length > 0) {
+        const [field, val] = entries[0];
+        const fieldMsg = Array.isArray(val) ? val[0] : String(val);
+        errorMsg = `${field}: ${fieldMsg}`;
       }
     }
     
@@ -194,10 +196,12 @@ export async function apiPatch(endpoint: string, body: Record<string, unknown>) 
       errorMsg = errorData.detail;
     } else if (errorData?.error) {
       errorMsg = errorData.error;
-    } else if (typeof errorData === 'object') {
-      const firstError = Object.values(errorData)[0];
-      if (firstError) {
-        errorMsg = Array.isArray(firstError) ? firstError[0] : String(firstError);
+    } else if (typeof errorData === 'object' && errorData !== null) {
+      const entries = Object.entries(errorData);
+      if (entries.length > 0) {
+        const [field, val] = entries[0];
+        const fieldMsg = Array.isArray(val) ? val[0] : String(val);
+        errorMsg = `${field}: ${fieldMsg}`;
       }
     }
     throw new Error(errorMsg);

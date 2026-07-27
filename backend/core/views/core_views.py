@@ -4,33 +4,40 @@ This module provides read-only endpoints for retrieving system-wide configuratio
 data such as issue categories, sub-issue types, and company types.
 """
 
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics, permissions
 
 from core.models import Issue, SubIssue, CompanyType
 from core.serializers import IssueSerializer, SubIssueSerializer, CompanyTypeSerializer
 
 
-class IssueListView(generics.ListAPIView):
+class IssueListView(generics.ListCreateAPIView):
     """
-    API endpoint that lists all available high-level issue categories.
-    Used for populating dropdowns during ticket creation.
-    Required Authentication: JWT Token.
+    API endpoint that lists all available high-level issue categories,
+    and allows admins to create new ones.
+    Required Authentication: JWT Token (GET), Admin JWT Token (POST).
     """
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [permissions.IsAdminUser()]
+        return [permissions.IsAuthenticated()]
 
 
-class SubIssueListView(generics.ListAPIView):
+class SubIssueListView(generics.ListCreateAPIView):
     """
-    API endpoint that lists all specific sub-issue types.
-    Can be filtered by parent 'issue' via query parameters if implemented by frontend.
-    Required Authentication: JWT Token.
+    API endpoint that lists all specific sub-issue types,
+    and allows admins to create new ones.
+    Required Authentication: JWT Token (GET), Admin JWT Token (POST).
     """
     queryset = SubIssue.objects.all()
     serializer_class = SubIssueSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [permissions.IsAdminUser()]
+        return [permissions.IsAuthenticated()]
 
 
 class CompanyTypeListView(generics.ListAPIView):
@@ -41,4 +48,4 @@ class CompanyTypeListView(generics.ListAPIView):
     """
     queryset = CompanyType.objects.all()
     serializer_class = CompanyTypeSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
