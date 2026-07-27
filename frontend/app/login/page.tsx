@@ -153,10 +153,10 @@ export default function LoginPage() {
         <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-purple-600 rounded-full animate-pulse-glow-purple z-0"></div>
         
         {/* Futuristic rotated watermark text */}
-        <div className="absolute right-[-10%] top-[40%] text-[8vw] font-black font-mono tracking-widest text-slate-800/10 leading-none uppercase rotate-[348deg] select-none">
+        <div className="absolute right-[-10%] top-[40%] text-[8vw] font-black font-mono tracking-widest text-slate-800/10 leading-none uppercase rotate-348 select-none">
           TICKET_SYS_2.0
         </div>
-        <div className="absolute left-[-5%] bottom-[10%] text-[6vw] font-black font-mono tracking-wider text-slate-800/5 leading-none uppercase rotate-[15deg] select-none">
+        <div className="absolute left-[-5%] bottom-[10%] text-[6vw] font-black font-mono tracking-wider text-slate-800/5 leading-none uppercase rotate-15 select-none">
           SECURE_ACCESS
         </div>
       </div>
@@ -165,7 +165,7 @@ export default function LoginPage() {
       <div className="flex-1 flex flex-col lg:flex-row min-h-[85vh] relative z-10">
         
         {/* LEFT TECHNICAL BRANDING SECTION */}
-        <div className="flex w-full lg:w-1/2 flex-col items-center justify-center p-8 lg:p-16 bg-gradient-to-br from-slate-900/60 via-slate-950/70 to-slate-900/60 lg:border-r border-slate-850 backdrop-blur-sm">
+        <div className="flex w-full lg:w-1/2 flex-col items-center justify-center p-8 lg:p-16 bg-linear-to-br from-slate-900/60 via-slate-950/70 to-slate-900/60 lg:border-r border-slate-850 backdrop-blur-sm">
           <div className="space-y-10 max-w-md w-full flex flex-col items-center">
             
             {/* BRANDING */}
@@ -176,7 +176,7 @@ export default function LoginPage() {
                 <span className="text-xs uppercase tracking-[3px] text-purple-400 font-bold">Secure Gateway</span>
                 <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
               </div>
-              <h1 className="text-4xl lg:text-5xl font-black text-white tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">
+              <h1 className="text-4xl lg:text-5xl font-black tracking-tight bg-clip-text text-transparent bg-linear-to-r from-white via-slate-200 to-slate-400">
                 Silicon HelpDesk
               </h1>
               <p className="text-slate-400 text-sm font-medium">Next-Generation Support & Issue Tracking</p>
@@ -308,15 +308,25 @@ export default function LoginPage() {
 
         {/* RIGHT AUTHENTICATION SECTION */}
         <div className="flex w-full lg:w-1/2 items-center justify-center p-8 lg:p-16">
-          <div className="w-full max-w-md space-y-8 bg-slate-900/40 p-8 rounded-2xl border border-slate-800/85 backdrop-blur-md shadow-2xl">
+          <div className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-white/10 bg-slate-950/65 p-8 shadow-[0_24px_90px_rgba(15,23,42,0.65)] backdrop-blur-xl">
+            <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-blue-500 via-purple-500 to-pink-500" />
+            <div className="absolute -right-16 top-10 h-40 w-40 rounded-full bg-blue-500/10 blur-3xl" />
+            <div className="absolute -bottom-20 left-0 h-44 w-44 rounded-full bg-purple-500/10 blur-3xl" />
+
             {/* CARD HEADER */}
-            <div className="space-y-2">
-              <h2 className="text-3xl font-extrabold text-white tracking-tight">
-                Authenticate
-              </h2>
-              <p className="text-sm text-slate-400">
-                Enter your credentials to access the system
-              </p>
+            <div className="relative space-y-4">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-slate-300">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
+                Member Portal
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-3xl font-extrabold tracking-tight text-white lg:text-[2rem]">
+                  Authenticate
+                </h2>
+                <p className="max-w-sm text-sm leading-6 text-slate-400">
+                  Enter your credentials to access the system and continue to your dashboard.
+                </p>
+              </div>
             </div>
 
             {/* LOGIN FORM */}
@@ -328,7 +338,7 @@ export default function LoginPage() {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 bg-slate-850/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
+                  className="w-full rounded-xl border border-white/10 bg-slate-900/80 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-blue-500/80 focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/20"
                   placeholder="username or email"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -343,7 +353,7 @@ export default function LoginPage() {
                 </label>
                 <input
                   type="password"
-                  className="w-full px-4 py-3 bg-slate-850/80 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
+                  className="w-full rounded-xl border border-white/10 bg-slate-900/80 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-blue-500/80 focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/20"
                   placeholder="••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -354,7 +364,7 @@ export default function LoginPage() {
               {/* ERROR ALERT */}
               {error && (
                 <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-xs p-3.5 rounded-lg font-medium flex items-start gap-2">
-                  <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-4 h-4 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zm-11-1a1 1 0 11-2 0 1 1 0 012 0zM10 9a1 1 0 100-2 1 1 0 000 2zm3 1a1 1 0 11-2 0 1 1 0 012 0z" clipRule="evenodd" />
                   </svg>
                   <span>{error}</span>
@@ -365,10 +375,10 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full px-4 py-3 rounded-lg font-semibold uppercase tracking-wide text-sm transition-all duration-200 ${
+                className={`w-full rounded-xl px-4 py-3 font-semibold uppercase tracking-wide text-sm transition-all duration-200 ${
                   loading
-                    ? "bg-slate-700 text-slate-500 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/20 active:bg-blue-800 text-white"
+                    ? "cursor-not-allowed bg-slate-700 text-slate-500"
+                    : "bg-linear-to-r from-blue-600 via-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-500/20 hover:scale-[1.01] hover:shadow-blue-500/30 active:scale-[0.99]"
                 }`}
               >
                 {loading ? (
