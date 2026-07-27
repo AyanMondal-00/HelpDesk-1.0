@@ -159,18 +159,65 @@ class Ticket(TimeStampedModel):
 
     def save(self, *args, **kwargs):
         """
-        Override save to prevent modifications to closed tickets.
+        Override save to prevent modifications to closed tickets and trigger
+        notifications when a support member is assigned.
         """
         is_new = self.pk is None
+        assigned_changed = False
 
         if not is_new:
             # Check if current ticket in DB is already closed
-            old_status = Ticket.objects.get(pk=self.pk).status
+            old_instance = Ticket.objects.get(pk=self.pk)
+            old_status = old_instance.status
 
             if old_status == self.Status.CLOSED:
                 raise ValueError("Closed tickets cannot be modified.")
 
+            # Check if assignment changed
+            if self.assigned_to and old_instance.assigned_to != self.assigned_to:
+                assigned_changed = True
+        else:
+            # If created with a member assigned right away
+            if self.assigned_to:
+                assigned_changed = True
+
         super().save(*args, **kwargs)
+
+        # Send email notification after successful save
+        if assigned_changed and self.assigned_to and self.assigned_to.user.email:
+            self.send_assignment_email()
+
+    def send_assignment_email(self):
+        """
+        Send an email notification to the assigned support member.
+        """
+        from django.core.mail import send_mail
+        from django.conf import settings
+        
+        subject = f"[Helpdesk] New Ticket Assigned: {self.ticket_number}"
+        message = f"""Hi {self.assigned_to.user.username},
+
+You have been assigned to handle a new helpdesk ticket.
+
+Ticket Details:
+- Ticket Number: {self.ticket_number}
+- Issue: {self.issue.name}
+- Sub-Issue: {self.sub_issue.name}
+- Client Company: {self.client.company_name}
+- Description: {self.description}
+
+Please take care and respond to customer as soon as possible.
+
+Best regards,
+Silicon Systems 
+"""
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [self.assigned_to.user.email],
+            fail_silently=True,
+        )
 
     def __str__(self):
         """Return string representation of the ticket (number and status)."""
