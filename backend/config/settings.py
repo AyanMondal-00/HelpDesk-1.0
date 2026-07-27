@@ -137,6 +137,12 @@ STATIC_URL = 'static/'
 # Custom user model
 AUTH_USER_MODEL = 'accounts.User'
 
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # Django REST Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
